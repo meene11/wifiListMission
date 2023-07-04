@@ -1,0 +1,10 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: WebProjectMission
+Bundle-SymbolicName: WebProjectMission
+Bundle-Version: 1.0.0.qualifier
+Bundle-RequiredExecutionEnvironment: JavaSE-1.8
+Automatic-Module-Name: WebProjectMission
+ kr.board.controller,
+ kr.board.entity,
+ kr.board.mapper

@@ -1,0 +1,157 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="kr.board.mapper.BoardMapper">
+
+	<insert id="wifiInfoInsert" parameterType="kr.board.entity.WifiDao">
+		insert into wifi_info
+			(
+			distance
+			, mgrNo
+			, wrdOfc
+			, mainNm
+			, adres1
+			, adres2
+			, instlFloor
+			, instlTy
+			, instlMby
+			, svcSe
+			, cmcwr
+			, cnstcYear
+			, inoutDoor
+			, remars3
+			, lat
+			, lnt
+			, workDttm
+			)
+		values
+			(
+			#{distance}
+			, #{mgrNo}
+			, #{wrdOfc}
+			, #{mainNm}
+			, #{adres1}
+			, #{adres2}
+			, #{instlFloor}
+			, #{instlTy}
+			, #{instlMby}
+			, #{svcSe}
+			, #{cmcwr}
+			, #{cnstcYear}
+			, #{inoutDoor}
+			, #{remars3}
+			, #{lat}
+			, #{lnt}
+			, #{workDttm}
+			);
+	</insert>
+	
+	<select id="getNearbyWifi" resultType="kr.board.entity.WifiDao" parameterType="kr.board.entity.LocationDao">
+		select *, round((6371 * acos( cos( radians(#{xLntWi}) ) * cos( radians(lnt) ) * cos( radians( #{yLatGyeong} ) - radians(lat) ) + sin( radians(#{xLntWi}) ) * sin( radians(lnt) ) ) ), 4) AS distance2 from wifi_info order by distance2 ASC limit 20
+		<!-- 
+		select *, round((6371 * acos( cos( radians(37.552128) ) * cos( radians(lnt) ) * cos( radians( 127.0677504 ) - radians(lat) ) + sin( radians(37.552128) ) * sin( radians(lnt) ) ) ), 4) AS distance2 from wifi_info order by distance2 ASC limit 20
+		 -->	
+	</select>
+	
+	
+	<select id="getWifiInfo" resultType="kr.board.entity.WifiVo">
+		select * from wifi_info
+	</select>
+	
+	<!-- 위치 히스토리 목록 저장 -->
+	<insert id="hisWifiListInsert" parameterType="kr.board.entity.HisLocaDao">
+		insert into HisLocaDao
+			(
+			  mainNm
+			, lat
+			, lnt
+			, workDate
+			)
+		values
+			(
+			  #{mainNm}
+			, #{lat}
+			, #{lnt}
+			, date_format(now(), '%Y%m%d%H%i%s')
+			);
+	</insert>
+	
+	<!-- 위치 히스토리 목록 조회 -->
+	<select id="getHisWifiList" resultType="kr.board.entity.HisLocaDao">
+		select *, date_format(now(), '%Y-%m-%d %H:%i:%s') as workDate2 from HisLocaDao order by idx desc
+	</select>
+	
+	<!-- 위치 히스토리 목록 id 로 삭제 -->
+	<delete id="hisWifiDelete" parameterType="int">
+		delete from HisLocaDao where idx = #{idx}
+	</delete>
+	
+	<select id="wifiDetail" resultType="kr.board.entity.WifiVo" parameterType="String">
+		select * from wifi_info where mgrNo = #{value}
+	</select>
+	
+	<!-- 북마크그룹 -->
+	<select id="getbookmarkGroup" resultType="kr.board.entity.BookmarkGroup">
+		select * from bookmarkGroup order by orderTurn ASC
+	</select>
+	
+	<insert id="bookmarkGroupInsert" parameterType="kr.board.entity.BookmarkGroup">
+		insert into bookmarkGroup
+			(
+			  bookmarkNm
+			, orderTurn
+			, applyDate
+			)
+		values
+			(
+			  #{bookmarkNm}
+			, #{orderTurn}
+			, date_format(now(), '%Y-%m-%d %H:%i:%s')
+			);
+	</insert>
+	
+	<select id="bookmarkGroupDetail" resultType="kr.board.entity.BookmarkGroup">
+		select * from bookmarkGroup where bkidx = #{bkidx}
+	</select>
+	
+	<update id="bookmarkGroupUpdate" parameterType="kr.board.entity.BookmarkGroup">
+		update bookmarkGroup set bookmarkNm=#{bookmarkNm}, orderTurn=#{orderTurn}, upddate=date_format(now(), '%Y-%m-%d %H:%i:%s')
+		where bkidx = #{bkidx}
+	</update>
+	
+	
+	<delete id="bookmarkGroupDelete" parameterType="int">
+		delete from bookmarkGroup where bkidx = #{bkidx}
+	</delete>
+	
+	<!-- 즐겨찾기(북마크) -->
+	<select id="favoritesList" resultType="kr.board.entity.favoritesDao">
+		select * from favorites order by favidx asc
+	</select>
+	
+	<insert id="favoritesInsert" parameterType="kr.board.entity.favoritesDao">
+		insert into favorites
+			(
+			  favBkNm
+			, favWifiNm
+			, favAplDate
+			)
+		values
+			(
+			  #{favBkNm}
+			, #{favWifiNm}
+			, date_format(now(), '%Y-%m-%d %H:%i:%s')
+			);
+	</insert>
+	
+	<delete id="favoritesDelete" parameterType="int">
+		delete from favorites where favidx = #{favidx}
+	</delete>
+	
+	<select id="favoritesDetail" resultType="kr.board.entity.favoritesDao">
+		select * from favorites where favidx = #{favidx}
+	</select>
+	
+	
+	
+	
+</mapper>
